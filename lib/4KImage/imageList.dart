@@ -5,9 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:gbk2utf8/gbk2utf8.dart';
+import 'package:gbk_codec/gbk_codec.dart';
 import 'model.dart';
-
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart' as html;
@@ -50,7 +49,6 @@ class _MainImageListState extends State<MainImageList>
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
     return DefaultTabController(
       length: 13,
       child: Scaffold(
@@ -117,7 +115,6 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
 
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     return RefreshIndicator(
       onRefresh: _refreshData,
       child: Container(
@@ -161,7 +158,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
     Dio dio = Dio();
     dio.options.responseType = ResponseType.bytes;
     Response<List<int>> res = await dio.get<List<int>>(url);
-    final result = decodeGbk(res.data);
+    final result = gbk_bytes.decode(res.data!);
 
     html.Document dom = parse(result);
     var uls = dom.body!.querySelector("ul.clearfix");
@@ -190,8 +187,8 @@ class ImageCell extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Container(
-              constraints:
-                  BoxConstraints(minHeight: ScreenUtil.instance.setHeight(200)),
+              constraints: BoxConstraints(
+                  minHeight: ScreenUtil().setHeight(200).toDouble()),
               child: CachedNetworkImage(
                 imageUrl: imageInfo!.imgUrl,
                 placeholder: (context, url) => Center(
@@ -236,7 +233,7 @@ class SearchBarDelegate extends SearchDelegate<String> {
     return IconButton(
         icon: AnimatedIcon(
             icon: AnimatedIcons.menu_arrow, progress: transitionAnimation),
-        onPressed: () => close(context, null));
+        onPressed: () => close(context, "result"));
   }
 
   @override
@@ -301,8 +298,9 @@ class SearchBarDelegate extends SearchDelegate<String> {
     print("statuscode");
     print(res.statusCode);
     print(res.headers);
-    final result = decodeGbk(res.data);
+    final result = gbk_bytes.decode(res.data!);
     print(result);
+    return [ImgInfo()];
     //这样直接写不会返回搜索的所需要的东西，可能需要自定义请求头,写了一些请求头还是不行
   }
 

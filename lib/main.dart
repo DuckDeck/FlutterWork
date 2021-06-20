@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_work/five/main.dart';
+import 'package:flutter_work/4KImage/imageList.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,12 +32,13 @@ class MyApp extends StatelessWidget {
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => HomePage(),
         '/five': (BuildContext context) => FiveStrokePage(),
+        '/4kimage': (BuildContext context) => MainImageList(),
       },
     );
   }
 }
 
-const items = ["五笔反查"];
+const items = ["五笔反查", "4K图片"];
 
 class HomePage extends StatelessWidget {
   @override
@@ -66,6 +68,9 @@ class HomePage extends StatelessWidget {
     switch (index) {
       case 0:
         Navigator.of(context).pushNamed("/five");
+        break;
+      case 1:
+        Navigator.of(context).pushNamed("/4kimage");
     }
   }
 }

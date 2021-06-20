@@ -3,32 +3,31 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_work/4KImage/model.dart';
 import 'package:dio/dio.dart';
-import 'package:gbk2utf8/gbk2utf8.dart';
+import 'package:gbk_codec/gbk_codec.dart';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart' as html;
 import 'package:flutter/cupertino.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ImageDetail extends StatefulWidget {
   ImageDetail({this.imgInfo});
-  final ImgInfo imgInfo;
+  final ImgInfo? imgInfo;
 
   @override
   _ImageDetailState createState() => _ImageDetailState();
 }
 
 class _ImageDetailState extends State<ImageDetail> {
-  ImgDetail imgDetail;
+  ImgDetail? imgDetail;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.imgInfo.imgName),
+          title: Text(widget.imgInfo!.imgName),
         ),
         body: FutureBuilder<ImgDetail>(
             future: _getData(),
@@ -41,7 +40,6 @@ class _ImageDetailState extends State<ImageDetail> {
                     child: CircularProgressIndicator(),
                   );
                 case ConnectionState.done:
-                  print("snapshot.data");
                   print(snapshot.data);
                   if (snapshot.data == null) {
                     return Center(child: Text("HTML解析失败"));
@@ -51,10 +49,10 @@ class _ImageDetailState extends State<ImageDetail> {
                         children: <Widget>[
                           Container(
                             constraints: BoxConstraints(
-                                minHeight: ScreenUtil.instance.setHeight(375) /
-                                    snapshot.data.resolution.rate),
+                                minHeight: ScreenUtil().setHeight(375) /
+                                    snapshot.data!.resolution!.rate),
                             child: CachedNetworkImage(
-                              imageUrl: snapshot.data.imgUrl,
+                              imageUrl: snapshot.data!.imgUrl,
                               placeholder: (context, url) => Center(
                                 child: CircularProgressIndicator(),
                               ),
@@ -78,13 +76,13 @@ class _ImageDetailState extends State<ImageDetail> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: <Widget>[
-                                RaisedButton(
+                                ElevatedButton(
                                   child: Text("下载"),
                                   onPressed: () {
                                     saveImage(snapshot.data!.imgUrl);
                                   },
                                 ),
-                                RaisedButton(
+                                ElevatedButton(
                                   child: Text("原图下载"),
                                   onPressed: () {
                                     Fluttertoast.showToast(
@@ -113,12 +111,7 @@ class _ImageDetailState extends State<ImageDetail> {
             }));
   }
 
-  void toLogin() {
-    Navigator.of(context)
-        .push(CupertinoPageRoute(builder: (BuildContext context) {
-      return LoginPage();
-    }));
-  }
+  void toLogin() {}
 
   void toPage(ImgInfo item) {
     Navigator.of(context)
@@ -145,12 +138,14 @@ class _ImageDetailState extends State<ImageDetail> {
   Future<ImgDetail> _getData() async {
     Dio dio = Dio();
     dio.options.responseType = ResponseType.bytes;
-    Response<List<int>> res = await dio.get<List<int>>(widget.imgInfo.imgPage);
-    final result = decodeGbk(res.data);
+    print(widget.imgInfo!.imgPage);
+    Response<List<int>> res = await dio.get<List<int>>(widget.imgInfo!.imgPage);
+    final result = gbk_bytes.decode(res.data!);
 
     html.Document dom = parse(result);
     var a = dom.body!.querySelector("a#img");
-    String imgUrl = "http://pic.netbian.com/" + a.firstChild.attributes["src"];
+    String imgUrl =
+        "http://pic.netbian.com/" + a!.firstChild!.attributes["src"]!;
     final info = dom.body!.querySelector("div.infor");
 
     final resolution = Resolution.parse(info!.children[1].children.first.text);
@@ -164,24 +159,19 @@ class _ImageDetailState extends State<ImageDetail> {
     print("主图片");
     print(imgDetail);
     var more = dom.body!.querySelector("ul.clearfix");
-    // more.children.forEach((f){
-    //   var imgTag = f.querySelector("img");
-    //   var title = f.querySelector("a");
-    //   print(f);
-    //   print(imgTag.attributes["src"]);
-    //   print(title.attributes["title"]);
-    // });
     final imgs = more!.children.map((item) {
       var imgTag = item.querySelector("img");
       var title = item.querySelector("a");
-      var u = "http://pic.netbian.com/" + imgTag.attributes["src"];
-      final imgPage = "http://pic.netbian.com/" + title.attributes["href"];
+      var u = "http://pic.netbian.com/" + imgTag!.attributes["src"]!;
+      final imgPage = "http://pic.netbian.com/" + title!.attributes["href"]!;
       var subImg = ImgInfo(
-          imgUrl: u, imgName: title.attributes["title"], imgPage: imgPage);
+          imgUrl: u, imgName: title.attributes["title"]!, imgPage: imgPage);
+      print("subImg:");
       print(subImg);
       return subImg;
     }).toList();
-
+    print("imgs:");
+    print(imgs);
     imgDetail.moreImages = imgs;
     return imgDetail;
   }

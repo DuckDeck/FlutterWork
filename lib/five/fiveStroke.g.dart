@@ -8,7 +8,7 @@ part of 'fiveStroke.dart';
 
 FiveStroke _$FiveStrokeFromJson(Map<String, dynamic> json) {
   return FiveStroke(
-    id: json['ID'] as int,
+    id: 0,
     text: json['Word'] as String,
     pinyin: json['PinYin'] as String,
     img: json['ImgCode'] as String,
