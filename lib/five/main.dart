@@ -153,10 +153,10 @@ class _FiveStrokePageState extends State<FiveStrokePage> {
             title: Text("提示删除"),
             content: Text("你确定要删除全部缓存吗？"),
             actions: [
-              FlatButton(
+              TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text("取消")),
-              FlatButton(
+              TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true);
                     deleteData();

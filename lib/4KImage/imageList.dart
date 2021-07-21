@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gbk_codec/gbk_codec.dart';
+import 'package:skeleton_loader/skeleton_loader.dart';
 import 'model.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
@@ -93,17 +95,19 @@ class ScrollImagesPage extends StatefulWidget {
 class _ScrollImagesPageState extends State<ScrollImagesPage>
     with AutomaticKeepAliveClientMixin {
   ScrollController _scrollController = ScrollController();
+  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
   int _page = 0;
   int _eLoading = 0; //0不显示 1 正在请求 2 没有更多数据
-  List<ImgInfo> items = [];
-
+  Future<void>? items;
+  List<ImgInfo> photos = [];
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _refreshData();
+    items = _initData();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
@@ -115,38 +119,95 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _refreshData,
-      child: Container(
-        color: Colors.grey[100],
-        child: StaggeredGridView.countBuilder(
-          controller: _scrollController,
-          itemCount: items.length,
-          primary: false,
-          crossAxisCount: 4,
-          mainAxisSpacing: 4.0,
-          crossAxisSpacing: 4.0,
-          itemBuilder: (context, index) => ImageCell(
-            imageInfo: items[index],
-          ),
-          staggeredTileBuilder: (index) => StaggeredTile.fit(2),
-        ),
-      ),
-    );
+    return FutureBuilder(
+        future: items,
+        builder: (BuildContext context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              {
+                return SingleChildScrollView(
+                    child: SkeletonGridLoader(
+                  builder: Card(
+                    color: Colors.transparent,
+                    child: GridTile(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            width: 150,
+                            height: 120,
+                            color: Colors.white,
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            width: 150,
+                            height: 10,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  items: 10,
+                  itemsPerRow: 2,
+                  period: Duration(seconds: 2),
+                  highlightColor: Colors.lightBlue[300]!,
+                  direction: SkeletonDirection.ltr,
+                  childAspectRatio: 1,
+                ));
+              }
+            case ConnectionState.done:
+              {
+                print("请求完成");
+                print(photos.length);
+
+                return RefreshIndicator(
+                  key: _refreshIndicatorKey,
+                  onRefresh: _refreshData,
+                  child: Container(
+                    color: Colors.grey[100],
+                    child: StaggeredGridView.countBuilder(
+                      controller: _scrollController,
+                      itemCount: photos.length,
+                      primary: false,
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 4.0,
+                      crossAxisSpacing: 4.0,
+                      itemBuilder: (context, index) => ImageCell(
+                        imageInfo: photos[index],
+                      ),
+                      staggeredTileBuilder: (index) => StaggeredTile.fit(2),
+                    ),
+                  ),
+                );
+              }
+          }
+        });
   }
 
-  Future<Null> _refreshData() async {
+  Future _initData() async {
+    photos = await _getData(false);
+  }
+
+  Future _refreshData() async {
     _page = 0;
-    items.clear();
-    _getData(false);
+    final ps = await _getData(false);
+    setState(() {
+      photos = ps;
+    });
   }
 
-  Future<Null> _addMoreData() async {
+  Future _addMoreData() async {
     _page++;
-    _getData(true);
+    final ps = await _getData(true);
+    setState(() {
+      photos += ps;
+    });
   }
 
-  void _getData(bool _deAdd) async {
+  Future<List<ImgInfo>> _getData(bool _deAdd) async {
     print("开始请求，类型是${widget.imgCat!.name}");
     var index = "";
     if (_page > 0) {
@@ -163,42 +224,42 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
     html.Document dom = parse(result);
     var uls = dom.body!.querySelector("ul.clearfix");
 
-    setState(() {
-      items += uls!.children.map((img) {
-        final tag = img.firstChild;
-        final imgPage = "http://pic.netbian.com/" + tag!.attributes["href"]!;
-        final imgUrl =
-            "http://pic.netbian.com/" + tag.firstChild!.attributes["src"]!;
-        final imgName = tag.firstChild!.attributes["alt"];
-        return ImgInfo(imgName: imgName!, imgPage: imgPage, imgUrl: imgUrl);
-      }).toList();
-    });
+    return uls!.children.map((img) {
+      final tag = img.firstChild;
+      final imgPage = "http://pic.netbian.com/" + tag!.attributes["href"]!;
+      final imgUrl =
+          "http://pic.netbian.com/" + tag.firstChild!.attributes["src"]!;
+      final imgName = tag.firstChild!.attributes["alt"];
+      return ImgInfo(imgName: imgName!, imgPage: imgPage, imgUrl: imgUrl);
+    }).toList();
   }
 }
 
 class ImageCell extends StatelessWidget {
-  ImageCell({this.imageInfo});
-  final ImgInfo? imageInfo;
+  ImageCell({required this.imageInfo});
+  ImgInfo imageInfo;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Card(
           child: Container(
+        padding: EdgeInsets.all(5),
         child: Column(
           children: <Widget>[
             Container(
-              constraints: BoxConstraints(
-                  minHeight: ScreenUtil().setHeight(200).toDouble()),
+              constraints: BoxConstraints(minHeight: 120),
               child: CachedNetworkImage(
-                imageUrl: imageInfo!.imgUrl,
-                placeholder: (context, url) => Center(
-                  child: CircularProgressIndicator(),
-                ),
+                imageUrl: imageInfo.imgUrl,
+                progressIndicatorBuilder: (context, url, progress) =>
+                    Center(child: Text("loading")),
                 errorWidget: (context, url, error) => Icon(Icons.error),
               ),
             ),
+            SizedBox(
+              height: 5,
+            ),
             Center(
-              child: Text(imageInfo!.imgName),
+              child: Text(imageInfo.imgName),
             )
           ],
         ),
@@ -207,7 +268,7 @@ class ImageCell extends StatelessWidget {
         Navigator.of(context)
             .push(CupertinoPageRoute(builder: (BuildContext context) {
           return ImageDetail(
-            imgInfo: imageInfo!,
+            imgInfo: imageInfo,
           );
         }));
       },
