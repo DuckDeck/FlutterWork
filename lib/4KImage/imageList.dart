@@ -4,7 +4,6 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:skeleton_loader/skeleton_loader.dart';
@@ -26,8 +25,7 @@ class MainImageList extends StatefulWidget {
   _MainImageListState createState() => _MainImageListState();
 }
 
-class _MainImageListState extends State<MainImageList>
-    with SingleTickerProviderStateMixin {
+class _MainImageListState extends State<MainImageList> with SingleTickerProviderStateMixin {
   var titles = [
     CatInfo(name: "最新", urlSegment: "new"),
     CatInfo(name: "风景", urlSegment: "4kfengjing"),
@@ -92,11 +90,9 @@ class ScrollImagesPage extends StatefulWidget {
   _ScrollImagesPageState createState() => _ScrollImagesPageState();
 }
 
-class _ScrollImagesPageState extends State<ScrollImagesPage>
-    with AutomaticKeepAliveClientMixin {
+class _ScrollImagesPageState extends State<ScrollImagesPage> with AutomaticKeepAliveClientMixin {
   ScrollController _scrollController = ScrollController();
-  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
+  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   int _page = 0;
   int _eLoading = 0; //0不显示 1 正在请求 2 没有更多数据
   Future<void>? items;
@@ -109,8 +105,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
     super.initState();
     items = _initData();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
         print("到最下在开始圆形更多");
         _addMoreData();
       }
@@ -227,8 +222,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
     return uls!.children.map((img) {
       final tag = img.firstChild;
       final imgPage = "http://pic.netbian.com/" + tag!.attributes["href"]!;
-      final imgUrl =
-          "http://pic.netbian.com/" + tag.firstChild!.attributes["src"]!;
+      final imgUrl = "http://pic.netbian.com/" + tag.firstChild!.attributes["src"]!;
       final imgName = tag.firstChild!.attributes["alt"];
       return ImgInfo(imgName: imgName!, imgPage: imgPage, imgUrl: imgUrl);
     }).toList();
@@ -269,8 +263,7 @@ class ImageCell extends StatelessWidget {
         ),
       )),
       onTap: () {
-        Navigator.of(context)
-            .push(CupertinoPageRoute(builder: (BuildContext context) {
+        Navigator.of(context).push(CupertinoPageRoute(builder: (BuildContext context) {
           return ImageDetail(
             imgInfo: imageInfo,
           );
@@ -295,10 +288,7 @@ class SearchBarDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildLeading(BuildContext context) {
-    return IconButton(
-        icon: AnimatedIcon(
-            icon: AnimatedIcons.menu_arrow, progress: transitionAnimation),
-        onPressed: () => close(context, "result"));
+    return IconButton(icon: AnimatedIcon(icon: AnimatedIcons.menu_arrow, progress: transitionAnimation), onPressed: () => close(context, "result"));
   }
 
   @override
@@ -316,8 +306,7 @@ class SearchBarDelegate extends SearchDelegate<String> {
             case ConnectionState.done:
               return Container(
                 child: Center(
-                  child: Text(
-                      "直接用他们的链接搜索的话一直返回没有搜索到相关的内容，但是网页是可以的，可能需要自定义请求头,写了一些请求头还是不行"),
+                  child: Text("直接用他们的链接搜索的话一直返回没有搜索到相关的内容，但是网页是可以的，可能需要自定义请求头,写了一些请求头还是不行"),
                 ),
               );
           }
@@ -327,13 +316,7 @@ class SearchBarDelegate extends SearchDelegate<String> {
   Future<List<ImgInfo>> _getData() async {
     Dio dio = Dio();
     dio.interceptors.add(CookieManager(CookieJar()));
-    var data = {
-      "keyboard": query,
-      "tempid": 1,
-      "tbname": "photo",
-      "show": "title",
-      "submit": ""
-    };
+    var data = {"keyboard": query, "tempid": 1, "tbname": "photo", "show": "title", "submit": ""};
     print("请求的数据");
     print(data);
     var url = "http://pic.netbian.com/e/search/index.php";
@@ -341,20 +324,16 @@ class SearchBarDelegate extends SearchDelegate<String> {
 
     var option = Options();
     option.headers = {
-      HttpHeaders.acceptHeader:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      HttpHeaders.acceptHeader: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
       HttpHeaders.acceptEncodingHeader: "gzip, deflate",
       HttpHeaders.cacheControlHeader: "max-age=0",
       HttpHeaders.contentTypeHeader: "application/x-www-form-urlencoded",
-      HttpHeaders.userAgentHeader:
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36 Edg/79.0.309.54"
+      HttpHeaders.userAgentHeader: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36 Edg/79.0.309.54"
     };
 
-    dio.options.contentType =
-        ContentType.parse("application/x-www-form-urlencoded").toString();
+    dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded").toString();
     print(dio.options.contentType);
-    var res =
-        await dio.post<List<int>>(url, queryParameters: data, options: option);
+    var res = await dio.post<List<int>>(url, queryParameters: data, options: option);
 
     var location = res.headers.value("Location");
     print("header");
@@ -380,8 +359,7 @@ class SearchBarDelegate extends SearchDelegate<String> {
               title: RichText(
                   text: TextSpan(
                 text: recentSuggest[index],
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
               )),
             ));
   }
