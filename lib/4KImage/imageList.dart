@@ -250,8 +250,12 @@ class ImageCell extends StatelessWidget {
               constraints: BoxConstraints(minHeight: 120),
               child: CachedNetworkImage(
                 imageUrl: imageInfo.imgUrl,
-                progressIndicatorBuilder: (context, url, progress) =>
-                    Center(child: Text("loading")),
+                progressIndicatorBuilder: (context, url, progress) => Center(
+                    child: Container(
+                  width: 50,
+                  height: 50,
+                  child: Image.asset('images/spin.gif'),
+                )),
                 errorWidget: (context, url, error) => Icon(Icons.error),
               ),
             ),
