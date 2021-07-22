@@ -111,6 +111,11 @@ class _ImageDetailState extends State<ImageDetail> {
   void toLogin() {}
 
   void toPage(ImgInfo item) {
+    print("will go" + item.imgPage);
+    if (item.imgPage == "https://pic.netbian.com/4kdongman/") {
+      Navigator.of(context).pop();
+      return;
+    }
     Navigator.of(context).push(CupertinoPageRoute(builder: (BuildContext context) {
       return ImageDetail(
         imgInfo: item,
@@ -131,8 +136,10 @@ class _ImageDetailState extends State<ImageDetail> {
 
   Future<ImgDetail> _getData() async {
     Dio dio = Dio();
+    final imgDetail = ImgDetail();
     dio.options.responseType = ResponseType.bytes;
     print(widget.imgInfo!.imgPage);
+
     Response<List<int>> res = await dio.get<List<int>>(widget.imgInfo!.imgPage);
     final result = gbk_bytes.decode(res.data!);
 
@@ -144,7 +151,7 @@ class _ImageDetailState extends State<ImageDetail> {
     final resolution = Resolution.parse(info!.children[1].children.first.text);
     final size = info.children[2].children.first.text;
     final updateTime = info.children[3].children.first.text;
-    final imgDetail = ImgDetail();
+
     imgDetail.sizeStr = size;
     imgDetail.imgUrl = imgUrl;
     imgDetail.updateTimeStr = updateTime;
@@ -153,10 +160,15 @@ class _ImageDetailState extends State<ImageDetail> {
     print(imgDetail);
     var more = dom.body!.querySelector("ul.clearfix");
     final imgs = more!.children.map((item) {
-      var imgTag = item.querySelector("img");
-      var title = item.querySelector("a");
-      var u = "http://pic.netbian.com/" + imgTag!.attributes["src"]!;
-      final imgPage = "http://pic.netbian.com/" + title!.attributes["href"]!;
+      final imgTag = item.querySelector("img");
+      final title = item.querySelector("a");
+      final u = "http://pic.netbian.com/" + imgTag!.attributes["src"]!;
+      var herf = title!.attributes["href"]!;
+      var imgPage = herf;
+      if (!herf.contains("http")) {
+        imgPage = "http://pic.netbian.com/" + herf;
+      }
+
       var subImg = ImgInfo(imgUrl: u, imgName: imgTag.attributes["alt"]!, imgPage: imgPage);
       print("subImg:" + subImg.toString());
       return subImg;
