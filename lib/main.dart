@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_work/five/main.dart';
 import 'package:flutter_work/4KImage/imageList.dart';
+import 'package:mmkv/mmkv.dart';
 
-void main() {
+void main() async {
+  final rootDir = await MMKV.initialize();
+  print('MMKV for flutter with rootDir = $rootDir');
   runApp(MyApp());
 }
 
