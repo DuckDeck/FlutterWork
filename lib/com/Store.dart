@@ -1,5 +1,6 @@
 import 'package:mmkv/mmkv.dart';
 
+//这样还远远不够。因为自定义变量无法保存
 class Store<T extends num, string> {
   late String name;
   T? _value;

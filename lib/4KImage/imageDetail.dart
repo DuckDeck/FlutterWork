@@ -124,6 +124,7 @@ class _ImageDetailState extends State<ImageDetail> {
   }
 
   void saveImage(String img) async {
+    print(img);
     var response = await Dio().get(img, options: Options(responseType: ResponseType.bytes));
     final result = await ImageGallerySaver.saveImage(Uint8List.fromList(response.data));
     print("下载结果" + result);

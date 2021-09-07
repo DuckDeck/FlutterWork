@@ -18,21 +18,15 @@ class FiveStroke {
   final String img;
   @JsonKey(name: "FiveCode")
   final String code;
-  FiveStroke(
-      {this.id = 0,
-      this.text = "",
-      this.pinyin = "",
-      this.img = "",
-      this.code = ""});
-  factory FiveStroke.fromJson(Map<String, dynamic> json) =>
-      _$FiveStrokeFromJson(json);
+  FiveStroke({this.id = 0, this.text = "", this.pinyin = "", this.img = "", this.code = ""});
+  factory FiveStroke.fromJson(Map<String, dynamic> json) => _$FiveStrokeFromJson(json);
 
   Map<String, dynamic> toJson() => _$FiveStrokeToJson(this);
 
   static Future<ResultInfo> getFiveStroke(String words) async {
     var resData = ResultInfo();
     Dio dio = Dio();
-    Response res = await dio.get("http://lovelive.ink:7110/five/" + words);
+    Response res = await dio.get("http://lovelive.ink:9000/five/" + words);
     if (res.statusCode! != 200) {
       resData.code = res.statusCode! - 500;
       resData.msg = res.statusMessage!;
