@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_work/com/Store.dart';
 import 'package:flutter_work/five/fiveStroke.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FiveStrokePage extends StatefulWidget {
@@ -22,6 +24,11 @@ class _FiveStrokePageState extends State<FiveStrokePage> {
   @override
   void initState() {
     super.initState();
+
+    var f = FiveStroke();
+    print("是否有注解");
+    print(f);
+
     getFives().then((value) => setData(value));
     _textEditingController.addListener(() {
       print(_textEditingController.text);
@@ -39,9 +46,7 @@ class _FiveStrokePageState extends State<FiveStrokePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("五笔反查"), actions: [
-          IconButton(icon: Icon(Icons.delete), onPressed: showDeleteAction)
-        ]),
+        appBar: AppBar(title: Text("五笔反查"), actions: [IconButton(icon: Icon(Icons.delete), onPressed: showDeleteAction)]),
         body: Container(
             padding: const EdgeInsets.all(10),
             child: Column(
@@ -54,8 +59,7 @@ class _FiveStrokePageState extends State<FiveStrokePage> {
                       ),
                     ),
                     SizedBox(
-                      child: IconButton(
-                          icon: Icon(Icons.search), onPressed: search),
+                      child: IconButton(icon: Icon(Icons.search), onPressed: search),
                       width: 40,
                     )
                   ],
@@ -76,9 +80,7 @@ class _FiveStrokePageState extends State<FiveStrokePage> {
                           });
                         },
                         background: Container(
-                          child: Text('右滑删除',
-                              style:
-                                  TextStyle(fontSize: 22, color: Colors.white)),
+                          child: Text('右滑删除', style: TextStyle(fontSize: 22, color: Colors.white)),
                           color: Colors.red,
                           padding: EdgeInsets.only(left: 10),
                           alignment: Alignment.center,
@@ -153,9 +155,7 @@ class _FiveStrokePageState extends State<FiveStrokePage> {
             title: Text("提示删除"),
             content: Text("你确定要删除全部缓存吗？"),
             actions: [
-              TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text("取消")),
+              TextButton(onPressed: () => Navigator.of(context).pop(), child: Text("取消")),
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(true);

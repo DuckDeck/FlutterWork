@@ -1,23 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_work/com/Result.dart';
-import 'package:meta/meta.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'fiveStroke.g.dart';
 
 @JsonSerializable()
-@immutable
 class FiveStroke {
   @JsonKey(name: "ID")
-  final int id;
+  int id;
   @JsonKey(name: "Word")
-  final String text;
+  String text;
   @JsonKey(name: "PinYin")
-  final String pinyin;
+  String pinyin;
   @JsonKey(name: "ImgCode")
-  final String img;
+  String img;
   @JsonKey(name: "FiveCode")
-  final String code;
+  String code;
   FiveStroke({this.id = 0, this.text = "", this.pinyin = "", this.img = "", this.code = ""});
   factory FiveStroke.fromJson(Map<String, dynamic> json) => _$FiveStrokeFromJson(json);
 
