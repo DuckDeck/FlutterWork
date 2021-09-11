@@ -139,6 +139,7 @@
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				E4FF6679659C0A496061524F /* [CP] Embed Pods Frameworks */,
+				AE1B2CD826EA2C0800F8C5D9 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -223,7 +224,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
+		};
+		AE1B2CD826EA2C0800F8C5D9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sed -i \"\" \"s/<mmkv\\/MMKVPlugin.h>/<mmkvflutter\\/MMKVPlugin.h>/g\" ${SRCROOT}/Runner/GeneratedPluginRegistrant.m\nsed -i \"\" \"s/@import mmkv;/@import mmkvflutter;/g\" ${SRCROOT}/Runner/GeneratedPluginRegistrant.m\n/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
 		};
 		C62DB68194E0B73249F11516 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
