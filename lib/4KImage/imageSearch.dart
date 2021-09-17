@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_work/4KImage/model.dart';
-import 'package:flutter_work/com/Store.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 
 const recentSuggest = [
@@ -14,7 +13,6 @@ const recentSuggest = [
 
 class SearchBarDelegate extends SearchDelegate<String> {
   List<ImgInfo> items = [];
-  final historySearch = Store(name: "HistorySearch", defaultValue: [String]);
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
