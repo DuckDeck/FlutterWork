@@ -1,38 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_work/4KImage/imageSearch.dart';
+import 'package:flutter_work/hotNews/model.dart';
 import 'package:gbk_codec/gbk_codec.dart';
 import 'package:skeleton_loader/skeleton_loader.dart';
-import 'model.dart';
+import 'package:flutter_work/com/Base.dart';
 import 'package:dio/dio.dart';
 import 'package:html/parser.dart';
 import 'package:html/dom.dart' as html;
 import 'package:flutter/cupertino.dart';
-import 'imageDetail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_work/com/Base.dart';
 
-class MainImageList extends StatefulWidget {
+class HotNewsList extends StatefulWidget {
   @override
-  _MainImageListState createState() => _MainImageListState();
+  _HotNewsListState createState() => _HotNewsListState();
 }
 
-class _MainImageListState extends State<MainImageList>
+class _HotNewsListState extends State<HotNewsList>
     with SingleTickerProviderStateMixin {
   var titles = [
-    CatInfo(name: "最新", urlSegment: "new"),
-    CatInfo(name: "风景", urlSegment: "4kfengjing"),
-    CatInfo(name: "美女", urlSegment: "4kmeinv"),
-    CatInfo(name: "游戏", urlSegment: "4kyouxi"),
-    CatInfo(name: "动漫", urlSegment: "4kdongman"),
-    CatInfo(name: "影视", urlSegment: "4kyingshi"),
-    CatInfo(name: "明星", urlSegment: "4kmingxing"),
-    CatInfo(name: "汽车", urlSegment: "4kqiche"),
-    CatInfo(name: "动物", urlSegment: "4kdongwu"),
-    CatInfo(name: "人物", urlSegment: "4krenwu"),
-    CatInfo(name: "美食", urlSegment: "4kmeishi"),
-    CatInfo(name: "宗教", urlSegment: "4kzongjiao"),
-    CatInfo(name: "背景", urlSegment: "4kbeijing"),
+    CatInfo(
+        name: "鱼塘热榜",
+        urlSegment: "hot_id=1065",
+        iconUrl: "https://img.printf520.com/鱼.png"),
+    CatInfo(
+        name: "虎扑热榜",
+        urlSegment: "hot_id=2",
+        iconUrl: "https://img.printf520.com/img/151.png"),
+    CatInfo(
+        name: "NGA热榜",
+        urlSegment: "hot_id=106",
+        iconUrl: "https://img.printf520.com/img/nga.png"),
   ];
 
   @override
@@ -46,7 +44,7 @@ class _MainImageListState extends State<MainImageList>
       length: 13,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("美图"),
+          title: const Text("鱼塘热榜"),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.search),
@@ -91,10 +89,9 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
   int _page = 0;
   int _eLoading = 0; //0不显示 1 正在请求 2 没有更多数据
   Future<void>? items;
-  List<ImgInfo> photos = [];
   @override
   bool get wantKeepAlive => true;
-
+  List<NewsInfo> arrNews = [];
   @override
   void initState() {
     super.initState();
@@ -152,7 +149,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
             case ConnectionState.done:
               {
                 print("请求完成");
-                print(photos.length);
+                print(arrNews.length);
 
                 return RefreshIndicator(
                   key: _refreshIndicatorKey,
@@ -161,13 +158,13 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
                     color: Colors.grey[100],
                     child: StaggeredGridView.countBuilder(
                       controller: _scrollController,
-                      itemCount: photos.length,
+                      itemCount: arrNews.length,
                       primary: false,
                       crossAxisCount: 4,
                       mainAxisSpacing: 4.0,
                       crossAxisSpacing: 4.0,
                       itemBuilder: (context, index) => ImageCell(
-                        imageInfo: photos[index],
+                        imageInfo: arrNews[index],
                       ),
                       staggeredTileBuilder: (index) => StaggeredTile.fit(2),
                     ),
@@ -179,14 +176,14 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
   }
 
   Future _initData() async {
-    photos = await _getData(false);
+    arrNews = await _getData(false);
   }
 
   Future _refreshData() async {
     _page = 0;
     final ps = await _getData(false);
     setState(() {
-      photos = ps;
+      arrNews = ps;
     });
   }
 
@@ -194,11 +191,11 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
     _page++;
     final ps = await _getData(true);
     setState(() {
-      photos += ps;
+      arrNews += ps;
     });
   }
 
-  Future<List<ImgInfo>> _getData(bool _deAdd) async {
+  Future<List<NewsInfo>> _getData(bool _deAdd) async {
     print("开始请求，类型是${widget.imgCat!.name}");
     var index = "";
     if (_page > 0) {
@@ -214,21 +211,12 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
 
     html.Document dom = parse(result);
     var uls = dom.body!.querySelector("ul.clearfix");
-    print(uls);
-    return uls!.children.map((img) {
-      final tag = img.firstChild;
-      final imgPage = "http://pic.netbian.com/" + tag!.attributes["href"]!;
-      final imgUrl =
-          "http://pic.netbian.com/" + tag.firstChild!.attributes["src"]!;
-      final imgName = tag.firstChild!.attributes["alt"];
-      return ImgInfo(imgName: imgName!, imgPage: imgPage, imgUrl: imgUrl);
-    }).toList();
   }
 }
 
-class ImageCell extends StatelessWidget {
-  ImageCell({required this.imageInfo});
-  ImgInfo imageInfo;
+class NewsCell extends StatelessWidget {
+  NewsCell({required this.news});
+  NewsInfo news;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -240,7 +228,7 @@ class ImageCell extends StatelessWidget {
             Container(
               constraints: BoxConstraints(minHeight: 120),
               child: CachedNetworkImage(
-                imageUrl: imageInfo.imgUrl,
+                imageUrl: news.newsImg,
                 progressIndicatorBuilder: (context, url, progress) => Center(
                     child: Container(
                   width: 50,
@@ -254,18 +242,18 @@ class ImageCell extends StatelessWidget {
               height: 5,
             ),
             Center(
-              child: Text(imageInfo.imgName),
+              child: Text(news.title),
             )
           ],
         ),
       )),
       onTap: () {
-        Navigator.of(context)
-            .push(CupertinoPageRoute(builder: (BuildContext context) {
-          return ImageDetail(
-            imgInfo: imageInfo,
-          );
-        }));
+        // Navigator.of(context)
+        //     .push(CupertinoPageRoute(builder: (BuildContext context) {
+        //   return ImageDetail(
+        //     imgInfo: imageInfo,
+        //   );
+        // }));
       },
     );
   }
