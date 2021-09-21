@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_work/4KImage/imageSearch.dart';
 import 'package:flutter_work/hotNews/model.dart';
-import 'package:gbk_codec/gbk_codec.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skeleton_loader/skeleton_loader.dart';
 import 'package:flutter_work/com/Base.dart';
 import 'package:dio/dio.dart';
-import 'package:html/parser.dart';
-import 'package:html/dom.dart' as html;
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_work/com/Result.dart';
 
 class HotNewsList extends StatefulWidget {
   @override
@@ -21,15 +20,15 @@ class _HotNewsListState extends State<HotNewsList>
   var titles = [
     CatInfo(
         name: "鱼塘热榜",
-        urlSegment: "hot_id=1065",
+        urlSegment: "1065",
         iconUrl: "https://img.printf520.com/鱼.png"),
     CatInfo(
         name: "虎扑热榜",
-        urlSegment: "hot_id=2",
+        urlSegment: "2",
         iconUrl: "https://img.printf520.com/img/151.png"),
     CatInfo(
         name: "NGA热榜",
-        urlSegment: "hot_id=106",
+        urlSegment: "106",
         iconUrl: "https://img.printf520.com/img/nga.png"),
   ];
 
@@ -41,7 +40,7 @@ class _HotNewsListState extends State<HotNewsList>
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 13,
+      length: titles.length,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("鱼塘热榜"),
@@ -86,7 +85,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
   ScrollController _scrollController = ScrollController();
   GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
-  int _page = 0;
+  int _page = 1;
   int _eLoading = 0; //0不显示 1 正在请求 2 没有更多数据
   Future<void>? items;
   @override
@@ -120,17 +119,16 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
                   builder: Card(
                     color: Colors.transparent,
                     child: GridTile(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Row(
                         children: <Widget>[
                           Container(
-                            width: 150,
-                            height: 120,
+                            width: 80,
+                            height: 80,
                             color: Colors.white,
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(width: 10),
                           Container(
-                            width: 150,
+                            width: 100,
                             height: 10,
                             color: Colors.white,
                           ),
@@ -139,7 +137,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
                     ),
                   ),
                   items: 10,
-                  itemsPerRow: 2,
+                  itemsPerRow: 1,
                   period: Duration(seconds: 2),
                   highlightColor: Colors.lightBlue[300]!,
                   direction: SkeletonDirection.ltr,
@@ -150,7 +148,6 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
               {
                 print("请求完成");
                 print(arrNews.length);
-
                 return RefreshIndicator(
                   key: _refreshIndicatorKey,
                   onRefresh: _refreshData,
@@ -160,13 +157,13 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
                       controller: _scrollController,
                       itemCount: arrNews.length,
                       primary: false,
-                      crossAxisCount: 4,
+                      crossAxisCount: 1,
                       mainAxisSpacing: 4.0,
                       crossAxisSpacing: 4.0,
-                      itemBuilder: (context, index) => ImageCell(
-                        imageInfo: arrNews[index],
+                      itemBuilder: (context, index) => NewsCell(
+                        news: arrNews[index],
                       ),
-                      staggeredTileBuilder: (index) => StaggeredTile.fit(2),
+                      staggeredTileBuilder: (index) => StaggeredTile.fit(1),
                     ),
                   ),
                 );
@@ -197,20 +194,32 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
 
   Future<List<NewsInfo>> _getData(bool _deAdd) async {
     print("开始请求，类型是${widget.imgCat!.name}");
-    var index = "";
-    if (_page > 0) {
-      index = "index_${_page + 1}.html";
-    }
 
-    var url = "http://pic.netbian.com/${widget.imgCat!.urlSegment}/$index";
+    var url =
+        "https://api.tophub.fun/v2/GetAllInfoGzip?id=${this.widget.imgCat!.urlSegment}&page=$_page&type=pc";
     print(url);
     Dio dio = Dio();
-    dio.options.responseType = ResponseType.bytes;
-    Response<List<int>> res = await dio.get<List<int>>(url);
-    final result = gbk_bytes.decode(res.data!);
+    Response res = await dio.get(url);
+    List<NewsInfo> nn = <NewsInfo>[];
 
-    html.Document dom = parse(result);
-    var uls = dom.body!.querySelector("ul.clearfix");
+    Map<String, dynamic> data = res.data;
+    if (data["Code"] as int != 0) {
+      Fluttertoast.showToast(msg: data["Message"] as String);
+      return nn;
+    }
+
+    List<dynamic> items = data["Data"]["data"];
+    print("--------有${items.length}条数据----------");
+    for (var item in items) {
+      var n = NewsInfo();
+      n.title = item["Title"];
+      n.source = item["Url"];
+      n.newsImg = item["imgUrl"];
+      n.newsCat = CatInfo(iconUrl: item["icon"], name: item["type"]);
+      nn.add(n);
+    }
+    print("--------获取到${nn.length}条数据----------");
+    return nn;
   }
 }
 
@@ -223,27 +232,62 @@ class NewsCell extends StatelessWidget {
       child: Card(
           child: Container(
         padding: EdgeInsets.all(5),
-        child: Column(
+        child: Row(
           children: <Widget>[
-            Container(
-              constraints: BoxConstraints(minHeight: 120),
-              child: CachedNetworkImage(
-                imageUrl: news.newsImg,
-                progressIndicatorBuilder: (context, url, progress) => Center(
-                    child: Container(
-                  width: 50,
-                  height: 50,
-                  child: Image.asset('images/spin.gif'),
-                )),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+            Visibility(
+              visible: news.newsImg.isNotEmpty,
+              child: Container(
+                width: 80,
+                height: 80,
+                child: CachedNetworkImage(
+                  fit: BoxFit.cover,
+                  imageUrl: news.newsImg,
+                  progressIndicatorBuilder: (context, url, progress) => Center(
+                      child: Container(
+                    width: 50,
+                    height: 50,
+                    child: Image.asset('images/spin.gif'),
+                  )),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
               ),
             ),
             SizedBox(
-              height: 5,
+              width: 8,
             ),
-            Center(
-              child: Text(news.title),
-            )
+            Expanded(
+                child: Container(
+                    child: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.all(5),
+                  child: Text(
+                    news.title,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+                // Text(news.title),
+                Row(
+                  children: [
+                    Container(
+                      width: 15,
+                      height: 15,
+                      child:
+                          CachedNetworkImage(imageUrl: news.newsCat.iconUrl!),
+                    ),
+                    SizedBox(
+                      width: 3,
+                    ),
+                    Text(
+                      news.newsCat.name!,
+                    ),
+                    Text(news.updateTime)
+                  ],
+                )
+              ],
+            )))
           ],
         ),
       )),

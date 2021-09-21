@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_work/five/main.dart';
 import 'package:flutter_work/4KImage/imageList.dart';
+import 'package:flutter_work/hotNews/main.dart';
 
 void main() async {
   runApp(MyApp());
@@ -33,12 +34,13 @@ class MyApp extends StatelessWidget {
         '/': (BuildContext context) => HomePage(),
         '/five': (BuildContext context) => FiveStrokePage(),
         '/4kimage': (BuildContext context) => MainImageList(),
+        '/news': (BuildContext context) => HotNewsList(),
       },
     );
   }
 }
 
-const items = ["五笔反查", "4K图片"];
+const items = ["五笔反查", "4K图片", "鱼塘热榜"];
 
 class HomePage extends StatelessWidget {
   @override
@@ -71,6 +73,10 @@ class HomePage extends StatelessWidget {
         break;
       case 1:
         Navigator.of(context).pushNamed("/4kimage");
+        break;
+      case 2:
+        Navigator.of(context).pushNamed("/news");
+        break;
     }
   }
 }
