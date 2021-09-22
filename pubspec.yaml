@@ -47,6 +47,7 @@ dependencies:
   dio_cookie_manager: ^2.0.0  
   image_gallery_saver: ^1.6.9
   plugin_platform_interface: ^2.0.0
+  webview_flutter: ^2.0.13
 dev_dependencies:
   flutter_test:
     sdk: flutter

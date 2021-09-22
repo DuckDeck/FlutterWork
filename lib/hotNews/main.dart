@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_work/4KImage/imageSearch.dart';
+import 'package:flutter_work/HotNews/newsWeb.dart';
 import 'package:flutter_work/hotNews/model.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skeleton_loader/skeleton_loader.dart';
@@ -292,12 +293,9 @@ class NewsCell extends StatelessWidget {
         ),
       )),
       onTap: () {
-        // Navigator.of(context)
-        //     .push(CupertinoPageRoute(builder: (BuildContext context) {
-        //   return ImageDetail(
-        //     imgInfo: imageInfo,
-        //   );
-        // }));
+        Navigator.of(context).push(CupertinoPageRoute(builder: (BuildContext context) {
+          return NewsWebPage(url: news.source);
+        }));
       },
     );
   }
