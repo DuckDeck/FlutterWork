@@ -205,7 +205,9 @@ class _ScrollImagesPageState extends State<ScrollImagesPage> with AutomaticKeepA
       if (item["icon"] != null && item["type"] != null) {
         n.newsCat = CatInfo(iconUrl: item["icon"], name: item["type"]);
       }
-      n.hotDesc = item["hotDesc"];
+      if (item["hotDesc"] != null) {
+        n.hotDesc = item["hotDesc"];
+      }
       nn.add(n);
     }
     print("--------获取到${nn.length}条数据----------");

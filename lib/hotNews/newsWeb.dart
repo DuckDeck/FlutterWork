@@ -23,7 +23,9 @@ class _NewsWebPageState extends State<NewsWebPage> {
     }
   }
 
+//发现一个严重的问题导致这个项目失败，这个网站的链接应该是加密的，然后应该是调用内部js解密，再生成url，目前这个问题无解。
   Widget build(BuildContext context) {
+    print(widget.url);
     return WebView(
       initialUrl: widget.url,
     );
