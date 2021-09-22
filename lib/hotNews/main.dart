@@ -8,28 +8,17 @@ import 'package:flutter_work/com/Base.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_work/com/Result.dart';
 
 class HotNewsList extends StatefulWidget {
   @override
   _HotNewsListState createState() => _HotNewsListState();
 }
 
-class _HotNewsListState extends State<HotNewsList>
-    with SingleTickerProviderStateMixin {
+class _HotNewsListState extends State<HotNewsList> with SingleTickerProviderStateMixin {
   var titles = [
-    CatInfo(
-        name: "鱼塘热榜",
-        urlSegment: "1065",
-        iconUrl: "https://img.printf520.com/鱼.png"),
-    CatInfo(
-        name: "虎扑热榜",
-        urlSegment: "2",
-        iconUrl: "https://img.printf520.com/img/151.png"),
-    CatInfo(
-        name: "NGA热榜",
-        urlSegment: "106",
-        iconUrl: "https://img.printf520.com/img/nga.png"),
+    CatInfo(name: "鱼塘热榜", urlSegment: "1065", iconUrl: "https://img.printf520.com/鱼.png"),
+    CatInfo(name: "虎扑热榜", urlSegment: "2", iconUrl: "https://img.printf520.com/img/151.png"),
+    CatInfo(name: "NGA热榜", urlSegment: "106", iconUrl: "https://img.printf520.com/img/nga.png"),
   ];
 
   @override
@@ -80,11 +69,9 @@ class ScrollImagesPage extends StatefulWidget {
   _ScrollImagesPageState createState() => _ScrollImagesPageState();
 }
 
-class _ScrollImagesPageState extends State<ScrollImagesPage>
-    with AutomaticKeepAliveClientMixin {
+class _ScrollImagesPageState extends State<ScrollImagesPage> with AutomaticKeepAliveClientMixin {
   ScrollController _scrollController = ScrollController();
-  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
+  GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   int _page = 1;
   int _eLoading = 0; //0不显示 1 正在请求 2 没有更多数据
   Future<void>? items;
@@ -96,8 +83,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
     super.initState();
     items = _initData();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
         print("到最下在开始圆形更多");
         _addMoreData();
       }
@@ -195,8 +181,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
   Future<List<NewsInfo>> _getData(bool _deAdd) async {
     print("开始请求，类型是${widget.imgCat!.name}");
 
-    var url =
-        "https://api.tophub.fun/v2/GetAllInfoGzip?id=${this.widget.imgCat!.urlSegment}&page=$_page&type=pc";
+    var url = "https://api.tophub.fun/v2/GetAllInfoGzip?id=${this.widget.imgCat!.urlSegment}&page=$_page&type=pc";
     print(url);
     Dio dio = Dio();
     Response res = await dio.get(url);
@@ -215,7 +200,11 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
       n.title = item["Title"];
       n.source = item["Url"];
       n.newsImg = item["imgUrl"];
-      n.newsCat = CatInfo(iconUrl: item["icon"], name: item["type"]);
+      n.updateTime = item["CreateTime"] as int;
+      if (item["icon"] != null && item["type"] != null) {
+        n.newsCat = CatInfo(iconUrl: item["icon"], name: item["type"]);
+      }
+      n.hotDesc = item["hotDesc"];
       nn.add(n);
     }
     print("--------获取到${nn.length}条数据----------");
@@ -225,7 +214,7 @@ class _ScrollImagesPageState extends State<ScrollImagesPage>
 
 class NewsCell extends StatelessWidget {
   NewsCell({required this.news});
-  NewsInfo news;
+  final NewsInfo news;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -258,34 +247,45 @@ class NewsCell extends StatelessWidget {
             Expanded(
                 child: Container(
                     child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   margin: EdgeInsets.all(5),
                   child: Text(
                     news.title,
-                    textAlign: TextAlign.left,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-
-                // Text(news.title),
-                Row(
-                  children: [
-                    Container(
-                      width: 15,
-                      height: 15,
-                      child:
-                          CachedNetworkImage(imageUrl: news.newsCat.iconUrl!),
-                    ),
-                    SizedBox(
-                      width: 3,
-                    ),
-                    Text(
-                      news.newsCat.name!,
-                    ),
-                    Text(news.updateTime)
-                  ],
-                )
+                news.newsCat == null
+                    ? Container()
+                    : Row(
+                        children: [
+                          Container(
+                            width: 14,
+                            height: 14,
+                            child: CachedNetworkImage(imageUrl: news.newsCat!.iconUrl!),
+                          ),
+                          SizedBox(
+                            width: 3,
+                          ),
+                          Text(
+                            news.newsCat!.name!,
+                          ),
+                          SizedBox(
+                            width: 3,
+                          ),
+                          news.hotDesc.isEmpty
+                              ? Container()
+                              : Text(news.hotDesc,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                  )),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(news.releaseTime)
+                        ],
+                      )
               ],
             )))
           ],

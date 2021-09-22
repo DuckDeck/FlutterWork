@@ -5,9 +5,22 @@ class NewsInfo {
   var title = "";
   var source = "";
   var newsImg = "";
-  var newsCat = CatInfo(name: "鱼塘热榜", urlSegment: "hot_id=1065");
-  var updateTime = "";
-  var hotScale = "";
+  CatInfo? newsCat;
+  var updateTime = 0;
+  String get releaseTime {
+    var t = DateTime.fromMillisecondsSinceEpoch(updateTime * 1000);
+    var now = DateTime.now();
+    var interval = now.difference(t);
+    print(interval.inSeconds);
+    if (interval.inSeconds < 60) {
+      return "${interval.inSeconds}秒前";
+    } else if (interval.inSeconds > 60 && interval.inSeconds < 3600) {
+      return "${interval.inSeconds ~/ 60}分钟前";
+    }
+    return "${interval.inSeconds ~/ 3600}小时前";
+  }
+
+  var hotDesc = "";
   var isNew = true;
   var isCollect = false;
 }
