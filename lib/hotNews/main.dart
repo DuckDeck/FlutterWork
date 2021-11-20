@@ -17,6 +17,7 @@ class HotNewsList extends StatefulWidget {
 
 class _HotNewsListState extends State<HotNewsList>
     with SingleTickerProviderStateMixin {
+  late TabController tabController;
   var titles = [
     CatInfo(
         name: "鱼塘热榜",
@@ -74,6 +75,10 @@ class _HotNewsListState extends State<HotNewsList>
   @override
   void initState() {
     super.initState();
+    tabController = TabController(length: titles.length, vsync: this)
+      ..addListener(() {
+        print(tabController.index);
+      });
   }
 
   @override
@@ -94,6 +99,7 @@ class _HotNewsListState extends State<HotNewsList>
           ],
           bottom: TabBar(
             isScrollable: true,
+            controller: tabController,
             tabs: titles.map((title) {
               return Tab(
                 text: title.name,
@@ -102,11 +108,12 @@ class _HotNewsListState extends State<HotNewsList>
           ),
         ),
         body: TabBarView(
+            controller: tabController,
             children: titles.map((img) {
-          return ScrollImagesPage(
-            imgCat: img,
-          );
-        }).toList()),
+              return ScrollImagesPage(
+                imgCat: img,
+              );
+            }).toList()),
         floatingActionButton: FloatingActionButton(
           onPressed: () => print("object"),
           child: IconButton(onPressed: () {}, icon: Icon(Icons.donut_small)),
@@ -114,6 +121,13 @@ class _HotNewsListState extends State<HotNewsList>
         ),
       ),
     );
+  }
+
+  void gotoYutangPage() {
+    Navigator.of(context)
+        .push(CupertinoPageRoute(builder: (BuildContext context) {
+      return NewsWebPage(url: titles[tabController.index].yutangUrl!);
+    }));
   }
 }
 
@@ -305,49 +319,51 @@ class NewsCell extends StatelessWidget {
             ),
             Expanded(
                 child: Container(
+                    constraints: BoxConstraints(minHeight: 60),
                     child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.all(5),
-                  child: Text(
-                    news.title,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                news.newsCat == null
-                    ? Container()
-                    : Row(
-                        children: [
-                          Container(
-                            width: 14,
-                            height: 14,
-                            child: CachedNetworkImage(
-                                imageUrl: news.newsCat!.iconUrl!),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.all(5),
+                          child: Text(
+                            news.title,
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(
-                            width: 3,
-                          ),
-                          Text(
-                            news.newsCat!.name!,
-                          ),
-                          SizedBox(
-                            width: 3,
-                          ),
-                          news.hotDesc.isEmpty
-                              ? Container()
-                              : Text(news.hotDesc,
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                  )),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(news.releaseTime)
-                        ],
-                      )
-              ],
-            )))
+                        ),
+                        news.newsCat == null
+                            ? Container()
+                            : Row(
+                                children: [
+                                  Container(
+                                    width: 14,
+                                    height: 14,
+                                    child: CachedNetworkImage(
+                                        imageUrl: news.newsCat!.iconUrl!),
+                                  ),
+                                  SizedBox(
+                                    width: 3,
+                                  ),
+                                  Text(
+                                    news.newsCat!.name!,
+                                  ),
+                                  SizedBox(
+                                    width: 3,
+                                  ),
+                                  news.hotDesc.isEmpty
+                                      ? Container()
+                                      : Text(news.hotDesc,
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                          )),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(news.releaseTime)
+                                ],
+                              )
+                      ],
+                    )))
           ],
         ),
       )),
