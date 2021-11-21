@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_work/4KImage/imageSearch.dart';
-import 'package:flutter_work/HotNews/newsWeb.dart';
 import 'package:flutter_work/hotNews/model.dart';
+import 'package:flutter_work/hotNews/newsWeb.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skeleton_loader/skeleton_loader.dart';
 import 'package:flutter_work/com/Base.dart';
@@ -33,11 +33,13 @@ class _HotNewsListState extends State<HotNewsList>
     CatInfo(
         name: "NGA热榜",
         urlSegment: "106",
-        iconUrl: "https://img.printf520.com/img/nga.png"),
+        iconUrl: "https://img.printf520.com/img/nga.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=106"),
     CatInfo(
         name: "知乎热榜",
         urlSegment: "1",
-        iconUrl: "https://img.printf520.com/img/zhihu.ico"),
+        iconUrl: "https://img.printf520.com/img/zhihu.ico",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=1"),
     CatInfo(
         name: "ACFUN热榜",
         urlSegment: "142",
@@ -115,8 +117,14 @@ class _HotNewsListState extends State<HotNewsList>
               );
             }).toList()),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => print("object"),
-          child: IconButton(onPressed: () {}, icon: Icon(Icons.donut_small)),
+          onPressed: () {
+            print('不要啊~');
+          },
+          child: IconButton(
+              onPressed: () {
+                gotoYutangPage();
+              },
+              icon: Icon(Icons.donut_small)),
           shape: CircleBorder(),
         ),
       ),
@@ -126,7 +134,8 @@ class _HotNewsListState extends State<HotNewsList>
   void gotoYutangPage() {
     Navigator.of(context)
         .push(CupertinoPageRoute(builder: (BuildContext context) {
-      return NewsWebPage(url: titles[tabController.index].yutangUrl!);
+      var cat = titles[tabController.index];
+      return NewsWebPage(catInfo: cat);
     }));
   }
 }
@@ -319,7 +328,8 @@ class NewsCell extends StatelessWidget {
             ),
             Expanded(
                 child: Container(
-                    constraints: BoxConstraints(minHeight: 60),
+                    constraints: BoxConstraints(
+                        minHeight: news.newsImg.isNotEmpty ? 80 : 30),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
