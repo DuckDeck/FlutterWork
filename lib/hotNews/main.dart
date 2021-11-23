@@ -43,35 +43,43 @@ class _HotNewsListState extends State<HotNewsList>
     CatInfo(
         name: "ACFUN热榜",
         urlSegment: "142",
-        iconUrl: "https://img.printf520.com/img/142.png"),
+        iconUrl: "https://img.printf520.com/img/142.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=142"),
     CatInfo(
         name: "什么值得买",
         urlSegment: "117",
-        iconUrl: "https://img.printf520.com/img/zdm.png"),
+        iconUrl: "https://img.printf520.com/img/zdm.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=117"),
     CatInfo(
         name: "知乎推荐",
         urlSegment: "1053",
-        iconUrl: "https://img.printf520.com/img/picture/zhihu.com.png"),
+        iconUrl: "https://img.printf520.com/img/picture/zhihu.com.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=1053"),
     CatInfo(
         name: "快科技热榜",
         urlSegment: "1048",
-        iconUrl: "https://img.printf520.com/img/1048.png"),
+        iconUrl: "https://img.printf520.com/img/1048.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=1048"),
     CatInfo(
         name: "抽屉热榜",
         urlSegment: "110",
-        iconUrl: "https://img.printf520.com/img/chouti.png"),
+        iconUrl: "https://img.printf520.com/img/chouti.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=110"),
     CatInfo(
         name: "水木社区",
         urlSegment: "9",
-        iconUrl: "https://images.newsmth.net/nForum/favicon.ico"),
+        iconUrl: "https://images.newsmth.net/nForum/favicon.ico",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=9"),
     CatInfo(
         name: "Zaker热榜",
         urlSegment: "151",
-        iconUrl: "https://img.printf520.com/img/151.png"),
+        iconUrl: "https://img.printf520.com/img/151.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=151"),
     CatInfo(
         name: "V2EX热榜",
         urlSegment: "59",
-        iconUrl: "https://v2ex.com/static/img/icon_rayps_64.png"),
+        iconUrl: "https://v2ex.com/static/img/icon_rayps_64.png",
+        yutangUrl: "https://mo.fish/?class_id=%E5%85%A8%E9%83%A8&hot_id=59"),
   ];
 
   @override
