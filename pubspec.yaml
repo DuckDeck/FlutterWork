@@ -49,7 +49,7 @@ dependencies:
   plugin_platform_interface: ^2.0.0
   webview_flutter: ^2.0.13
   flame: ^1.2.0
-  flame_audio: ^1.2.0
+ # flame_audio: ^1.2.0 //linux不兼容
 dev_dependencies:
   flutter_test:
     sdk: flutter

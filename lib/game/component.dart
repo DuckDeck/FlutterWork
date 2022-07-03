@@ -29,4 +29,8 @@ class HeroComponent extends SpriteAnimationComponent with HasGameRef {
   void rotateTo(double deg) {
     angle = deg;
   }
+
+  void flip({bool x = false, bool y = true}) {
+    scale = Vector2(scale.x * (y ? -1 : 1), scale.y * (x ? -1 : 1));
+  }
 }
