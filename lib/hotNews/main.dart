@@ -325,7 +325,7 @@ class NewsCell extends StatelessWidget {
                       child: Container(
                     width: 50,
                     height: 50,
-                    child: Image.asset('images/spin.gif'),
+                    child: Image.asset('assets/images/spin.gif'),
                   )),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),

@@ -1,14 +1,20 @@
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 
-class TargetComponent {
-  final Vector2 position;
-  final double radius;
+class HeroComponent extends SpriteAnimationComponent {
+  HeroComponent() : super(size: Vector2(50, 37), anchor: Anchor.center);
 
-  late Paint paint = Paint()..color = Colors.greenAccent;
+  @override
+  Future<void>? onLoad() async {
+    List<Sprite> sprites = [];
+    for (int i = 0; i <= 8; i++) {
+      sprites.add(await Sprite.load("adventure/adventurer-bow-0$i.png"));
+    }
+    animation = SpriteAnimation.spriteList(sprites, stepTime: 0.15);
+  }
 
-  TargetComponent({required this.position, this.radius = 20});
-  void render(Canvas canvas) {
-    canvas.drawCircle(position.toOffset(), radius, paint);
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    position = size / 2;
   }
 }
