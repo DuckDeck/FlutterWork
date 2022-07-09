@@ -11,7 +11,7 @@ import 'package:flutter_work/game/compoment/HeroComponent.dart';
 import 'package:flutter_work/game/compoment/MonsterComponent.dart';
 
 class MiniGame extends FlameGame
-    with HasDraggables, KeyboardEvents, PanDetector {
+    with HasDraggables, KeyboardEvents, PanDetector, TapDetector {
   late final JoystickComponent joystick;
   late final HeroComponent player;
   late final MonsterComponent monster;
@@ -43,7 +43,7 @@ class MiniGame extends FlameGame
         SpriteAnimation.spriteList(sprites, stepTime: 1 / 24, loop: true);
     Vector2 monsterSize = Vector2(64, 64);
     final double py = _random.nextDouble() * size.y;
-    final double px = size.x - monsterSize.x / 2;
+    final double px = _random.nextDouble() * size.x;
     monster = MonsterComponent(
         sprite: animation, size: monsterSize, position: Vector2(px, py));
     add(monster);
@@ -89,6 +89,12 @@ class MiniGame extends FlameGame
     }
 
     return super.onKeyEvent(event, keysPressed);
+  }
+
+  @override
+  void onTap() {
+    // TODO: implement onTap
+    monster.loss(50);
   }
 
   @override

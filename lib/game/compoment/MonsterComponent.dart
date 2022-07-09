@@ -1,8 +1,9 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_work/game/mixin/Liveable.dart';
 
-class MonsterComponent extends SpriteAnimationComponent {
+class MonsterComponent extends SpriteAnimationComponent with Liveable {
   MonsterComponent(
       {required SpriteAnimation sprite,
       required Vector2 size,
@@ -17,5 +18,16 @@ class MonsterComponent extends SpriteAnimationComponent {
   Future<void>? onLoad() async {
     // TODO: implement onLoad
     add(RectangleHitbox()..debugMode = true);
+    initPaint(lifeColor: Colors.yellow, lifePoint: 1000);
+  }
+
+  void move(Vector2 ds) {
+    position.add(ds);
+  }
+
+  @override
+  void onDied() {
+    // TODO: implement onDied
+    removeFromParent();
   }
 }
