@@ -12,7 +12,7 @@ class HeroComponent extends SpriteAnimationComponent with HasGameRef {
     }
     animation = SpriteAnimation.spriteList(sprites, stepTime: 0.15);
     position = gameRef.size / 2;
-    add(RectangleHitbox()..debugMode = true);
+    add(RectangleHitbox()..debugMode = false);
   }
 
   @override
