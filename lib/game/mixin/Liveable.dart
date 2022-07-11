@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +14,7 @@ mixin Liveable on PositionComponent {
   final double offsetY = 10;
   final double widthRadio = 1.5;
   final double lifeBarHeight = 4;
-
+  final Random _random = Random();
   final TextStyle _defaultTextStyle =
       const TextStyle(fontSize: 10, color: Colors.white);
   late final TextComponent _text;
@@ -63,7 +65,13 @@ mixin Liveable on PositionComponent {
   void loss(double point) {
     _currentLife -= point;
     _updateLiftText();
-    _damageText.addDamage(-point.toInt());
+    double crit = 0.75;
+    double critDamage = 1.65;
+    bool isCrit = _random.nextDouble() < crit;
+    if (isCrit) {
+      point = point * critDamage;
+    }
+    _damageText.addDamage(-point.toInt(), isCrit: isCrit);
     if (_currentLife <= 0) {
       _currentLife = 0;
       onDied();
