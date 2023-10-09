@@ -5,6 +5,7 @@ import 'package:flutter_work/five/main.dart';
 import 'package:flutter_work/4KImage/imageList.dart';
 import 'package:flutter_work/hotNews/main.dart';
 import 'package:flutter_work/game/game.dart';
+import 'package:flutter_work/live/main.dart';
 
 void main() async {
   runApp(MyApp());
@@ -38,12 +39,13 @@ class MyApp extends StatelessWidget {
         '/4kimage': (BuildContext context) => MainImageList(),
         '/news': (BuildContext context) => HotNewsList(),
         '/game': (BuildContext context) => GameWidget(game: MiniGame()),
+        '/live': (BuildContext context) => LivePage(),
       },
     );
   }
 }
 
-const items = ["五笔反查", "4K图片", "鱼塘热榜", "小游戏"];
+const items = ["五笔反查", "4K图片", "鱼塘热榜", "小游戏", "直播"];
 
 class HomePage extends StatelessWidget {
   @override
@@ -83,6 +85,9 @@ class HomePage extends StatelessWidget {
       case 3:
         Navigator.of(context).pushNamed("/game");
         break;
+      case 4:
+        Navigator.of(context).pushNamed("/live");
+
     }
   }
 }
